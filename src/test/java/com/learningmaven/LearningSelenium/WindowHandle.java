@@ -64,6 +64,9 @@ public class WindowHandle {
 			}
 		}
 
+		driver.switchTo().window(parentWindowHandle);
+		System.out.println("Switching back to Parent Window with ID: " + driver.getWindowHandle());
+
 	}
 
 	@AfterMethod
