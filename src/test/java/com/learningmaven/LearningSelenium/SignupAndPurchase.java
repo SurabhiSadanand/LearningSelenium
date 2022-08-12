@@ -17,24 +17,21 @@ import org.testng.annotations.Test;
 public class SignupAndPurchase {
 
 	WebDriver driver;
-	// instantiate the action class
-	Actions ac;
-	String email = "";
+	String email;
 
-	@BeforeMethod
+	@BeforeMethod(enabled = true)
 	public void setup() {
 		System.setProperty("webdriver.chrome.driver", "C:\\Drivers\\Chrome Driver\\chromedriver.exe");
 		driver = new ChromeDriver();
-		ac = new Actions(driver);
 		driver.get("https://naveenautomationlabs.com/opencart/index.php?route=account/register");
-		driver.manage().window().maximize();
-		driver.manage().timeouts().implicitlyWait(60, TimeUnit.SECONDS);
-		driver.manage().timeouts().setScriptTimeout(60, TimeUnit.SECONDS);
 		driver.manage().timeouts().pageLoadTimeout(60, TimeUnit.SECONDS);
+		driver.manage().timeouts().setScriptTimeout(60, TimeUnit.SECONDS);
+		driver.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
+		driver.manage().window().maximize();
 	}
 
-	@Test
-	public void signUp() {
+	@Test(priority = 1)
+	public void signUpTest() {
 
 		WebElement firstNameInputField = driver.findElement(By.cssSelector("#input-firstname"));
 		firstNameInputField.sendKeys("Surabhi");
@@ -42,12 +39,16 @@ public class SignupAndPurchase {
 		WebElement lastNameInputField = driver.findElement(By.cssSelector("#input-lastname"));
 		lastNameInputField.sendKeys("Sadanand");
 
+		Random rnd = new Random();
+
+		int ranNumber = rnd.nextInt(500);
+		email = "user" + ranNumber + "@gmail.com";
+
 		WebElement emailInputField = driver.findElement(By.cssSelector("#input-email"));
-		email = randomEmailGenerator();
 		emailInputField.sendKeys(email);
 
 		WebElement telephoneInputField = driver.findElement(By.cssSelector("#input-telephone"));
-		telephoneInputField.sendKeys("4372198016");
+		telephoneInputField.sendKeys("8872198016");
 
 		WebElement passwordInputField = driver
 				.findElement(By.cssSelector("fieldset:nth-of-type(2)>div:nth-of-type(1) input"));
@@ -61,51 +62,42 @@ public class SignupAndPurchase {
 
 		WebElement continueBtn = driver.findElement(By.cssSelector("div.buttons input:nth-of-type(2)"));
 		continueBtn.click();
-		sleep();
 
 		WebElement accountCreatedMessage = driver.findElement(By.cssSelector("#content h1"));
+		sleep();
 		String accountSuccessCreatedMessage = accountCreatedMessage.getText();
-		Assert.assertEquals(accountSuccessCreatedMessage, "Your Account Has Been Created!", "Message doesnot match");
-		sleep();
+		Assert.assertEquals(accountSuccessCreatedMessage, "Your Account Has Been Created!",
+				"Unable to register account,Try again!!");
+	}
 
-		driver.findElement(By.cssSelector(" div.list-group a:nth-of-type(13)")).click();
-		sleep();
+	@Test(priority = 2)
+	public void loginAndPurchaseTest() {
+		driver.navigate().to("https://naveenautomationlabs.com/opencart/index.php?route=account/login");
 
-		driver.findElement(By.cssSelector(" div.list-group a:nth-of-type(1)")).click();
-		sleep();
-
-		WebElement emailIdInputField = driver.findElement(By.cssSelector("#input-email"));
+		WebElement emailIdInputField = driver.findElement(By.cssSelector("div.well>form input"));
 		emailIdInputField.sendKeys(email);
 
-		WebElement passwrdInputField = driver.findElement(By.cssSelector("#input-password"));
+		WebElement passwrdInputField = driver.findElement(By.cssSelector("div.well>form div:nth-of-type(2) input"));
 		passwrdInputField.sendKeys("testPassword");
 
 		WebElement loginBTN = driver.findElement(By.cssSelector("input.btn"));
 		loginBTN.submit();
-		sleep();
-
-		driver.navigate().to("https://naveenautomationlabs.com/opencart/index.php?route=common/home");
-		sleep();
 
 		WebElement desktopProducts = driver.findElement(By.cssSelector("ul.nav.navbar-nav>li:nth-of-type(1) a"));
 		desktopProducts.click();
-		sleep();
 
 		WebElement macDesktop = driver.findElement(By.cssSelector("ul.list-unstyled li:nth-of-type(2) a"));
 		macDesktop.click();
-		sleep();
 
 		WebElement addToCartBtn = driver.findElement(By.cssSelector("div.button-group button:first-of-type"));
 		addToCartBtn.click();
-		sleep();
 
-		WebElement cartBtn = driver.findElement(By.cssSelector("#cart button"));
+		WebElement cartBtn = driver
+				.findElement(By.cssSelector("header div.container div.row div.col-sm-3 button.btn.btn-inverse"));
 		cartBtn.click();
-		sleep();
 
-		WebElement checkoutBtn = driver.findElement(By.cssSelector("p.text-right a:nth-of-type(2) strong"));
+		WebElement checkoutBtn = driver.findElement(By.cssSelector("ul.list-inline>li:nth-of-type(5) span"));
 		checkoutBtn.click();
-		sleep();
 
 		WebElement fnameInputField = driver.findElement(By.cssSelector("#input-payment-firstname"));
 		fnameInputField.sendKeys("Surabhi");
@@ -125,70 +117,54 @@ public class SignupAndPurchase {
 		WebElement postCodeInputField = driver.findElement(By.cssSelector("#input-payment-postcode"));
 		postCodeInputField.sendKeys("A1B2C3");
 
-		Select sc = new Select(driver.findElement(By.cssSelector("#input-payment-country")));
-		sc.selectByVisibleText("Canada");
+		WebElement countryField = driver.findElement(By.cssSelector("#input-payment-country"));
+		select(countryField).selectByVisibleText("Canada");
 
-		Select s = new Select(driver.findElement(By.cssSelector("#input-payment-zone")));
-		s.selectByVisibleText("Ontario");
+		WebElement zoneField = driver.findElement(By.cssSelector("#input-payment-zone"));
+		select(zoneField).selectByVisibleText("Ontario");
 
 		WebElement continueBtn1 = driver.findElement(By.cssSelector("div.buttons input"));
 		continueBtn1.click();
-		sleep();
 
 		WebElement continueBtn2 = driver.findElement(By.cssSelector("input#button-shipping-address"));
 		continueBtn2.click();
-		sleep();
 
 		WebElement continueBtn3 = driver.findElement(By.cssSelector("input#button-shipping-method"));
 		continueBtn3.click();
-		sleep();
 
 		WebElement termsAgreeBtn = driver.findElement(By.cssSelector(
 				"div.panel-group>div:nth-of-type(5)>div:nth-of-type(2)>div>div.buttons div.pull-right input:nth-of-type(1)"));
 		termsAgreeBtn.click();
-		sleep();
 
 		WebElement continueBtn4 = driver.findElement(By.cssSelector("div.pull-right #button-payment-method"));
 		continueBtn4.click();
-		sleep();
 
-		WebElement confirmOrderBtn = driver.findElement(By.cssSelector("#button-confirm"));
+		WebElement confirmOrderBtn = driver
+				.findElement(By.cssSelector("div#collapse-checkout-confirm div.panel-body>div:nth-of-type(2) input"));
 		confirmOrderBtn.click();
-		sleep();
 
+		sleep();
 		WebElement orderPlacedSuccessMessage = driver.findElement(By.cssSelector("#content h1"));
-		String orderPlacedmessage = orderPlacedSuccessMessage.getText();
-		Assert.assertEquals(orderPlacedmessage, "Your order has been placed!", "Message does not match");
-		sleep();
 
-		WebElement continueBtn5 = driver.findElement(By.cssSelector("a.btn"));
-		continueBtn5.click();
-		sleep();
+		WebElement orderPlacedMessageElement = driver.findElement(By.cssSelector("div#content h1"));
+		String messagePlacedText = orderPlacedMessageElement.getText();
+		Assert.assertEquals(messagePlacedText, "Your order has been placed!", "Message not matching");
 
-		WebElement myAccountBtn = driver.findElement(By.cssSelector("li.dropdown span"));
-		myAccountBtn.click();
-		sleep();
+		driver.findElement(By.cssSelector("ul.list-inline li.dropdown span:nth-of-type(1)")).click();
+		driver.findElement(By.cssSelector("ul.dropdown-menu.dropdown-menu-right>li:nth-of-type(5) a")).click();
 
-		WebElement LogoutBtn = driver.findElement(By.cssSelector("ul.dropdown-menu-right li:nth-of-type(5) a"));
-		LogoutBtn.click();
-		sleep();
-
-		WebElement logOutElement = driver.findElement(By.cssSelector("div#content h1"));
-		String logOutMessage = logOutElement.getText();
-		Assert.assertEquals(logOutMessage, "Account Logout", "Message does not match");
-		sleep();
-
+		WebElement logOutMessageElement = driver.findElement(By.cssSelector("div#content h1"));
+		String logOutMessage = logOutMessageElement.getText();
+		Assert.assertEquals(logOutMessage, "Account Logout", "Unable to succesfully logout!!");
 	}
 
-	public String randomEmailGenerator() {
+	public Select select(WebElement element) {
 
-		Random random = new Random();
-		int randomNumber = random.nextInt(100);
-		String email = "username" + randomNumber + "@gmail.com";
-		return email;
+		Select sc = new Select(element);
+		return sc;
 	}
 
-	@AfterMethod
+	@AfterMethod(enabled = true)
 	public void tearDown() {
 		driver.close();
 	}
